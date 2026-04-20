@@ -1,0 +1,94 @@
+:root {
+  --endless-sky: #0C457A;
+  --azure-palace: #115695;
+  --carnation-yellow: #F4DD4B;
+  --golden-corn: #F6C616;
+
+  --bg: var(--endless-sky);
+  --bg-secondary: var(--azure-palace);
+  --accent: var(--carnation-yellow);
+  --accent-alt: var(--golden-corn);
+  --text: #e8f0f8;
+  --text-h: #ffffff;
+  --border: rgba(244, 221, 75, 0.25);
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font: 18px/145% var(--sans);
+  letter-spacing: 0.18px;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+
+#root {
+  width: 1126px;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--endless-sky);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--heading);
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+h1 {
+  font-size: 56px;
+  letter-spacing: -1.68px;
+  margin: 32px 0;
+  @media (max-width: 1024px) {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+}
+
+h2 {
+  font-size: 36px;
+  letter-spacing: -0.5px;
+  margin: 0 0 16px;
+  color: var(--accent);
+  @media (max-width: 1024px) {
+    font-size: 28px;
+  }
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent-alt);
+}
+
+section {
+  padding: 80px 40px;
+  @media (max-width: 768px) {
+    padding: 60px 20px;
+  }
+}
