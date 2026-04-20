@@ -1,94 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; }
+
 :root {
   --endless-sky: #0C457A;
   --azure-palace: #115695;
   --carnation-yellow: #F4DD4B;
   --golden-corn: #F6C616;
 
-  --bg: var(--endless-sky);
-  --bg-secondary: var(--azure-palace);
-  --accent: var(--carnation-yellow);
-  --accent-alt: var(--golden-corn);
-  --text: #e8f0f8;
-  --text-h: #ffffff;
-  --border: rgba(244, 221, 75, 0.25);
+  --bg: #081e38;
+  --bg-card: rgba(12, 45, 80, 0.7);
+  --accent: #F4DD4B;
+  --accent-alt: #F6C616;
+  --text: #a8c4de;
+  --text-h: #f0f6ff;
+  --text-muted: #5a85a8;
+  --border: rgba(244, 221, 75, 0.12);
+  --border-hover: rgba(244, 221, 75, 0.35);
+  --glow: rgba(244, 221, 75, 0.08);
+  --shadow: 0 20px 60px rgba(0,0,0,0.4);
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  --serif: 'Playfair Display', Georgia, serif;
+  --sans: 'Inter', system-ui, sans-serif;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.7;
   color: var(--text);
   background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  background: var(--endless-sky);
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(17,86,149,0.4) 0%, transparent 70%);
+  min-height: 100vh;
 }
 
-h1,
-h2,
-h3 {
-  font-family: var(--heading);
-  font-weight: 600;
+#root {
+  max-width: 1080px;
+  margin: 0 auto;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--serif);
   color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-
-h2 {
-  font-size: 36px;
-  letter-spacing: -0.5px;
-  margin: 0 0 16px;
-  color: var(--accent);
-  @media (max-width: 1024px) {
-    font-size: 28px;
-  }
-}
-
-p {
   margin: 0;
+  line-height: 1.2;
 }
 
-a {
-  color: var(--accent);
-  text-decoration: none;
-}
+h1 { font-size: clamp(2.4rem, 5vw, 4rem); }
+h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 600; }
+h3 { font-size: 1.1rem; font-weight: 600; }
 
-a:hover {
-  color: var(--accent-alt);
-}
+p { margin: 0; }
+a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+a:hover { color: var(--accent-alt); }
+strong { color: var(--text-h); font-weight: 600; }
 
-section {
-  padding: 80px 40px;
-  @media (max-width: 768px) {
-    padding: 60px 20px;
-  }
+section { padding: 100px 56px; }
+
+@media (max-width: 768px) {
+  section { padding: 72px 24px; }
 }

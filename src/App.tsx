@@ -1,25 +1,31 @@
-import Navbar from "./components/Navbar";
-import Hero from "./components/Hero";
-import About from "./components/About";
-import Projects from "./components/Projects";
-import Internship from "./components/Internship";
-import Skills from "./components/Skills";
-import Education from "./components/Education";
-import Contact from "./components/Contact";
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Navbar from './components/Navbar'
+import Landing from './pages/Landing'
+import AboutPage from './pages/AboutPage'
+import ProjectsPage from './pages/ProjectsPage'
+import InternshipPage from './pages/InternshipPage'
+import SkillsPage from './pages/SkillsPage'
+import EducationPage from './pages/EducationPage'
+import ContactPage from './pages/ContactPage'
+import './App.css'
 
 function App() {
   return (
-    <div className="bg-gray-900 text-white">
+    <BrowserRouter>
       <Navbar />
-      <Hero />
-      <About />
-      <Projects />
-      <Internship />
-      <Skills />
-      <Education />
-      <Contact />
-    </div>
-  );
+      <main>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/internship" element={<InternshipPage />} />
+          <Route path="/skills" element={<SkillsPage />} />
+          <Route path="/education" element={<EducationPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+        </Routes>
+      </main>
+    </BrowserRouter>
+  )
 }
 
-export default App;
+export default App

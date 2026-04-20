@@ -1,41 +1,53 @@
 const technical = [
-  { category: 'Frontend Development', items: 'React, Next.js, HTML, CSS, JavaScript, TypeScript' },
-  { category: 'Backend Development', items: 'Laravel (PHP), Django, Node.js, Express' },
-  { category: 'Database Management', items: 'SQLite, PostgreSQL, Supabase, MySQL' },
-  { category: 'Styling', items: 'Tailwind CSS' },
-  { category: 'Tools & Platforms', items: 'Git, GitHub, Bitbucket, VS Code, Docker, Vite, Inertia.js, Railway, Vercel' },
-  { category: 'Other', items: 'REST API, WebSocket, JWT Auth, PDF Generation, QR Scanning' },
+  { category: 'Frontend', items: ['React', 'Next.js', 'HTML', 'CSS', 'JavaScript', 'TypeScript'] },
+  { category: 'Backend', items: ['Laravel (PHP)', 'Django', 'Node.js', 'Express'] },
+  { category: 'Database', items: ['SQLite', 'PostgreSQL', 'MySQL', 'Supabase'] },
+  { category: 'Styling', items: ['Tailwind CSS', 'CSS Modules'] },
+  { category: 'Tools', items: ['Git', 'GitHub', 'Docker', 'Vite', 'VS Code', 'Vercel', 'Railway'] },
+  { category: 'Other', items: ['REST API', 'WebSocket', 'JWT Auth', 'PDF Generation', 'QR Scanning'] },
 ]
 
 const soft = [
-  'Team collaboration and communication',
-  'Time management and task organization',
-  'Problem-solving and analytical thinking',
-  'Attention to detail and creativity',
+  { icon: '🤝', label: 'Team collaboration and communication' },
+  { icon: '⏰', label: 'Time management and task organization' },
+  { icon: '🧩', label: 'Problem-solving and analytical thinking' },
+  { icon: '🎨', label: 'Attention to detail and creativity' },
 ]
 
 export default function Skills() {
   return (
     <section id="skills">
-      <h2>Skills</h2>
-      <div className="skills-grid">
-        <div>
-          <h3>Technical Skills</h3>
-          <ul className="skills-list">
+      <div className="section-header">
+        <span className="section-eyebrow">What I Know</span>
+        <h2>Skills</h2>
+        <div className="section-line" />
+      </div>
+      <div className="skills-wrapper">
+        <div className="skills-technical">
+          <h3 className="skills-group-title">Technical Skills</h3>
+          <div className="skills-categories">
             {technical.map((s) => (
-              <li key={s.category}>
-                <strong>{s.category}:</strong> {s.items}
-              </li>
+              <div className="skill-category" key={s.category}>
+                <span className="skill-cat-label">{s.category}</span>
+                <div className="skill-tags">
+                  {s.items.map(item => (
+                    <span className="skill-tag" key={item}>{item}</span>
+                  ))}
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
-        <div>
-          <h3>Soft Skills</h3>
-          <ul className="skills-list">
+        <div className="skills-soft">
+          <h3 className="skills-group-title">Soft Skills</h3>
+          <div className="soft-list">
             {soft.map((s) => (
-              <li key={s}>{s}</li>
+              <div className="soft-item" key={s.label}>
+                <span className="soft-icon">{s.icon}</span>
+                <span>{s.label}</span>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       </div>
     </section>
