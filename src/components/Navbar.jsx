@@ -48,9 +48,22 @@ export default function Navbar() {
 
           <div className="navbar-right">
             {user ? (
-              <button className="nav-auth-btn" onClick={logout} title="Sign out">🔓 Logout</button>
+              <button className="nav-auth-btn" onClick={logout} title="Sign out">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Logout
+              </button>
             ) : (
-              <button className="nav-auth-btn" onClick={() => navigate('/login')} title="Admin login">🔐</button>
+              <button className="nav-auth-btn" onClick={() => navigate('/login')} title="Admin login">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="7.5" cy="15.5" r="5.5"/>
+                  <path d="M21 2l-9.6 9.6"/>
+                  <path d="M15.5 7.5l3 3L22 7l-3-3"/>
+                </svg>
+              </button>
             )}
             <button
               className={`navbar-toggle ${open ? 'toggle-open' : ''}`}

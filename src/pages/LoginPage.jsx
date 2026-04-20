@@ -5,18 +5,18 @@ import { useNavigate } from 'react-router-dom'
 export default function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
     setError('')
     setLoading(true)
-    const { error: err } = await login(email, password)
+    const { error: err } = login(username, password)
     if (err) {
-      setError('Invalid email or password.')
+      setError(err)
     } else {
       navigate('/')
     }
@@ -26,16 +26,20 @@ export default function LoginPage() {
   return (
     <div className="login-page">
       <form className="login-form" onSubmit={handleSubmit}>
-        <h2>Admin Login</h2>
-        <p className="login-sub">Sign in to edit your portfolio</p>
+        <div className="login-avatar">
+          <img src="/logos/ling.png" alt="AMG" className="login-avatar-img" />
+        </div>
+        <h2>Hey, Ling!</h2>
+        <p className="login-sub">Sign in to manage your portfolio</p>
         {error && <p className="login-error">{error}</p>}
         <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
           autoFocus
+          autoComplete="username"
         />
         <input
           type="password"
@@ -43,6 +47,7 @@ export default function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          autoComplete="current-password"
         />
         <button type="submit" className="entry-save-btn login-submit" disabled={loading}>
           {loading ? 'Signing in...' : 'Sign In'}
