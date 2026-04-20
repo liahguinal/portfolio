@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useAuth } from '../lib/AuthContext'
 
 const links = [
   { path: '/about',      label: 'About' },
@@ -16,6 +17,7 @@ export default function Navbar() {
   const navigate = useNavigate()
   const location = useLocation()
   const isLanding = location.pathname === '/'
+  const { user, logout } = useAuth()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -44,13 +46,20 @@ export default function Navbar() {
             ))}
           </ul>
 
-          <button
-            className={`navbar-toggle ${open ? 'toggle-open' : ''}`}
-            onClick={() => setOpen(!open)}
-            aria-label="Toggle menu"
-          >
-            <span /><span /><span />
-          </button>
+          <div className="navbar-right">
+            {user ? (
+              <button className="nav-auth-btn" onClick={logout} title="Sign out">🔓 Logout</button>
+            ) : (
+              <button className="nav-auth-btn" onClick={() => navigate('/login')} title="Admin login">🔐</button>
+            )}
+            <button
+              className={`navbar-toggle ${open ? 'toggle-open' : ''}`}
+              onClick={() => setOpen(!open)}
+              aria-label="Toggle menu"
+            >
+              <span /><span /><span />
+            </button>
+          </div>
         </>
       )}
     </nav>

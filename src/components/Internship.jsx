@@ -1,19 +1,9 @@
-import { useState } from 'react'
-
-// Add your daily entries here — description, images, docs are all optional
-const entries = {
-  // 'YYYY-MM-DD': { description: '...', shift: '8am-5pm' | '8am-7pm', images: [], docs: [] }
-  '2026-01-22': {
-    description: 'Orientation and setup ng development environment.',
-    shift: '8am-5pm',
-    images: [],
-    docs: [],
-  },
-}
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
+import { useAuth } from '../lib/AuthContext'
 
 const SHIFTS = ['8am-5pm', '8am-7pm']
 
-// Internship date range — adjust as needed
 const START_DATE = new Date(2026, 0, 22)
 const END_DATE = new Date(2026, 8, 30)
 
@@ -31,10 +21,13 @@ function toKey(date) {
 export default function Internship() {
   const [currentMonth, setCurrentMonth] = useState(new Date(START_DATE.getFullYear(), START_DATE.getMonth(), 1))
   const [selected, setSelected] = useState(null)
-  const [localEntries, setLocalEntries] = useState(entries)
+  const [entries, setEntries] = useState({})
   const [isEditing, setIsEditing] = useState(false)
   const [editText, setEditText] = useState('')
-  const [editShift, setEditShift] = useState('')
+  const [editShift, setEditShift] = useState('8am-5pm')
+  const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const { user } = useAuth()
 
   const year = currentMonth.getFullYear()
   const month = currentMonth.getMonth()
@@ -43,10 +36,23 @@ export default function Internship() {
 
   const prevMonth = () => setCurrentMonth(new Date(year, month - 1, 1))
   const nextMonth = () => setCurrentMonth(new Date(year, month + 1, 1))
-
   const monthLabel = currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })
+  const selectedEntry = selected ? entries[selected] : null
 
-  const selectedEntry = selected ? localEntries[selected] : null
+  // Load all entries from Supabase on mount
+  useEffect(() => {
+    async function fetchEntries() {
+      setLoading(true)
+      const { data, error } = await supabase.from('internship_entries').select('*')
+      if (!error && data) {
+        const map = {}
+        data.forEach((row) => { map[row.date] = row })
+        setEntries(map)
+      }
+      setLoading(false)
+    }
+    fetchEntries()
+  }, [])
 
   const handleEdit = () => {
     setEditText(selectedEntry?.description || '')
@@ -54,50 +60,52 @@ export default function Internship() {
     setIsEditing(true)
   }
 
-  const handleSave = () => {
-    setLocalEntries({
-      ...localEntries,
-      [selected]: {
-        ...localEntries[selected],
-        description: editText,
-        shift: editShift,
-      }
-    })
+  const handleSave = async () => {
+    setSaving(true)
+    const payload = {
+      date: selected,
+      description: editText,
+      shift: editShift,
+      images: selectedEntry?.images || [],
+      docs: selectedEntry?.docs || [],
+    }
+    const { error } = await supabase
+      .from('internship_entries')
+      .upsert(payload, { onConflict: 'date' })
+
+    if (!error) {
+      setEntries((prev) => ({ ...prev, [selected]: payload }))
+    }
+    setSaving(false)
     setIsEditing(false)
   }
 
   const handleCancel = () => {
     setIsEditing(false)
     setEditText('')
-    setEditShift('')
+    setEditShift('8am-5pm')
   }
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files)
     files.forEach((file) => {
       const reader = new FileReader()
-      reader.onload = (ev) => {
-        setLocalEntries((prev) => ({
-          ...prev,
-          [selected]: {
-            ...prev[selected],
-            images: [...(prev[selected]?.images || []), ev.target.result],
-          }
-        }))
+      reader.onload = async (ev) => {
+        const newImages = [...(entries[selected]?.images || []), ev.target.result]
+        const updated = { ...entries[selected], date: selected, images: newImages }
+        await supabase.from('internship_entries').upsert(updated, { onConflict: 'date' })
+        setEntries((prev) => ({ ...prev, [selected]: updated }))
       }
       reader.readAsDataURL(file)
     })
     e.target.value = ''
   }
 
-  const handleRemoveImage = (imgSrc) => {
-    setLocalEntries((prev) => ({
-      ...prev,
-      [selected]: {
-        ...prev[selected],
-        images: prev[selected].images.filter((s) => s !== imgSrc),
-      }
-    }))
+  const handleRemoveImage = async (imgSrc) => {
+    const newImages = entries[selected].images.filter((s) => s !== imgSrc)
+    const updated = { ...entries[selected], images: newImages }
+    await supabase.from('internship_entries').upsert(updated, { onConflict: 'date' })
+    setEntries((prev) => ({ ...prev, [selected]: updated }))
   }
 
   return (
@@ -107,6 +115,7 @@ export default function Internship() {
         <h2>Internship</h2>
         <div className="section-line" />
       </div>
+
       <div className="internship-card">
         <span className="project-year">2026</span>
         <h3>Provincial Treasurer's Office</h3>
@@ -130,43 +139,45 @@ export default function Internship() {
           <button onClick={nextMonth} aria-label="Next month">&#8594;</button>
         </div>
 
-        <div className="calendar-grid">
-          {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => (
-            <div className="calendar-day-label" key={d}>{d}</div>
-          ))}
+        {loading ? (
+          <p className="no-entry" style={{ textAlign: 'center', padding: '24px 0' }}>Loading entries...</p>
+        ) : (
+          <div className="calendar-grid">
+            {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => (
+              <div className="calendar-day-label" key={d}>{d}</div>
+            ))}
+            {Array.from({ length: firstDay }).map((_, i) => (
+              <div key={`empty-${i}`} />
+            ))}
+            {Array.from({ length: daysInMonth }).map((_, i) => {
+              const day = i + 1
+              const date = new Date(year, month, day)
+              const key = toKey(date)
+              const isInRange = date >= START_DATE && date <= END_DATE
+              const hasEntry = !!entries[key]
+              const isSelected = selected === key
 
-          {Array.from({ length: firstDay }).map((_, i) => (
-            <div key={`empty-${i}`} />
-          ))}
-
-          {Array.from({ length: daysInMonth }).map((_, i) => {
-            const day = i + 1
-            const date = new Date(year, month, day)
-            const key = toKey(date)
-            const isInRange = date >= START_DATE && date <= END_DATE
-            const hasEntry = !!localEntries[key]
-            const isSelected = selected === key
-
-            return (
-              <button
-                key={key}
-                className={`calendar-day ${isInRange ? 'in-range' : ''} ${hasEntry ? 'has-entry' : ''} ${isSelected ? 'selected' : ''}`}
-                onClick={() => isInRange && setSelected(isSelected ? null : key)}
-                disabled={!isInRange}
-                aria-label={`${key}${hasEntry ? ', has entry' : ''}`}
-              >
-                {day}
-                {hasEntry && <span className="entry-dot" aria-hidden="true" />}
-              </button>
-            )
-          })}
-        </div>
+              return (
+                <button
+                  key={key}
+                  className={`calendar-day ${isInRange ? 'in-range' : ''} ${hasEntry ? 'has-entry' : ''} ${isSelected ? 'selected' : ''}`}
+                  onClick={() => isInRange && setSelected(isSelected ? null : key)}
+                  disabled={!isInRange}
+                  aria-label={`${key}${hasEntry ? ', has entry' : ''}`}
+                >
+                  {day}
+                  {hasEntry && <span className="entry-dot" aria-hidden="true" />}
+                </button>
+              )
+            })}
+          </div>
+        )}
 
         {selected && (
           <div className="entry-detail">
             <div className="entry-detail-header">
               <h4>{selected}</h4>
-              {!isEditing && (
+              {!isEditing && user && (
                 <button className="entry-edit-btn" onClick={handleEdit} aria-label="Edit entry">
                   ✏️ Edit
                 </button>
@@ -198,8 +209,10 @@ export default function Internship() {
                   autoFocus
                 />
                 <div className="entry-edit-actions">
-                  <button className="entry-save-btn" onClick={handleSave}>Save</button>
-                  <button className="entry-cancel-btn" onClick={handleCancel}>Cancel</button>
+                  <button className="entry-save-btn" onClick={handleSave} disabled={saving}>
+                    {saving ? 'Saving...' : 'Save'}
+                  </button>
+                  <button className="entry-cancel-btn" onClick={handleCancel} disabled={saving}>Cancel</button>
                 </div>
               </div>
             ) : (
@@ -219,18 +232,13 @@ export default function Internship() {
                 {selectedEntry.images.map((src, idx) => (
                   <div key={idx} className="entry-image-wrap">
                     <img src={src} alt="internship entry" />
-                    <button
-                      className="remove-image-btn"
-                      onClick={() => handleRemoveImage(src)}
-                      aria-label="Remove image"
-                    >
-                      ✕
-                    </button>
+                    <button className="remove-image-btn" onClick={() => handleRemoveImage(src)} aria-label="Remove image">✕</button>
                   </div>
                 ))}
               </div>
             )}
 
+            {user && (
             <div className="entry-attach-section">
               <label className="attach-btn" htmlFor={`upload-${selected}`}>
                 📎 Attach Image
@@ -244,13 +252,6 @@ export default function Internship() {
                 style={{ display: 'none' }}
               />
             </div>
-
-            {selectedEntry?.docs?.length > 0 && (
-              <div className="entry-docs">
-                {selectedEntry.docs.map((doc) => (
-                  <a key={doc} href={doc} target="_blank" rel="noreferrer">📄 View Document</a>
-                ))}
-              </div>
             )}
           </div>
         )}
