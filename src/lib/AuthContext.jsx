@@ -1,33 +1,37 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
+import { supabase } from './supabase'
 
 const AuthContext = createContext(null)
 
-const CREDENTIALS = {
-  username: 'amg9223',
-  password: '@amg9223',
-}
-
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    return sessionStorage.getItem('amg_auth') === 'true' ? true : null
-  })
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-  const login = (username, password) => {
-    if (username === CREDENTIALS.username && password === CREDENTIALS.password) {
-      sessionStorage.setItem('amg_auth', 'true')
-      setUser(true)
-      return { error: null }
-    }
-    return { error: 'Invalid username or password.' }
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+      setLoading(false)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const login = async (email, password) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) return { error: error.message }
+    return { error: null }
   }
 
-  const logout = () => {
-    sessionStorage.removeItem('amg_auth')
-    setUser(null)
+  const logout = async () => {
+    await supabase.auth.signOut()
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   )

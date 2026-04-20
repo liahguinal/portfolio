@@ -5,16 +5,16 @@ import { useNavigate } from 'react-router-dom'
 export default function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     setLoading(true)
-    const { error: err } = login(username, password)
+    const { error: err } = await login(email, password)
     if (err) {
       setError(err)
     } else {
@@ -33,13 +33,13 @@ export default function LoginPage() {
         <p className="login-sub">Sign in to manage your portfolio</p>
         {error && <p className="login-error">{error}</p>}
         <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
           autoFocus
-          autoComplete="username"
+          autoComplete="email"
         />
         <input
           type="password"
