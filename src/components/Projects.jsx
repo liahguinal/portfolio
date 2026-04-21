@@ -2,42 +2,6 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/AuthContext'
 
-const staticProjects = [
-  {
-    id: 'edulink',
-    year: '2024 – 2026',
-    title: 'EduLink',
-    subtitle: 'School Curriculum Management System',
-    tag: 'Capstone – Completed',
-    description:
-      'A web-based system for Naawan Central School to secure academic records and simplify lesson plan management with PDF export.',
-    stack: ['Laravel', 'React', 'Inertia.js', 'PHP', 'TypeScript', 'Tailwind CSS', 'PostgreSQL', 'MySQL', 'DomPDF'],
-    logo_url: '/logos/ncs-edulink-logo-removebg-preview.png',
-  },
-  {
-    id: 'djangobnb',
-    year: '2025',
-    title: 'Djangobnb',
-    subtitle: 'Full-stack Airbnb Clone',
-    tag: 'Completed',
-    description:
-      'A fullstack Airbnb clone with property listings, real-time messaging via WebSocket, booking management, and JWT authentication.',
-    stack: ['Django', 'DRF', 'Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'PostgreSQL', 'Docker', 'Simple JWT'],
-    logo_url: '/logos/djangobnb-logo-removebg-preview.png',
-  },
-  {
-    id: 'docutrack',
-    year: '2026',
-    title: 'DocuTrack',
-    subtitle: 'Document Tracking System',
-    tag: "Internship – Provincial Treasurer's Office · Completed",
-    description:
-      'A full-stack document tracking system with QR code scanning, PDF generation, real-time status monitoring, deployed on Railway and Vercel.',
-    stack: ['React', 'TypeScript', 'Vite', 'Tailwind CSS', 'Node.js', 'Express', 'SQLite', 'Supabase', 'Railway', 'Vercel'],
-    logo_url: '/logos/pto-logo-removebg-preview.png',
-  },
-]
-
 const EMPTY_FORM = {
   year: '',
   title: '',
@@ -49,7 +13,7 @@ const EMPTY_FORM = {
 }
 
 export default function Projects() {
-  const [dynamicProjects, setDynamicProjects] = useState([])
+  const [projects, setProjects] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState(EMPTY_FORM)
   const [stackInput, setStackInput] = useState('')
@@ -62,12 +26,12 @@ export default function Projects() {
         .from('projects')
         .select('*')
         .order('sort_order', { ascending: true })
-      if (!error && data) setDynamicProjects(data)
+      if (!error && data) setProjects(data)
     }
     fetchProjects()
   }, [])
 
-  const allProjects = [...staticProjects, ...dynamicProjects]
+  const allProjects = projects
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -102,11 +66,11 @@ export default function Projects() {
     setSaving(true)
     const payload = {
       ...form,
-      sort_order: dynamicProjects.length + 1,
+      sort_order: projects.length + 1,
     }
     const { data, error } = await supabase.from('projects').insert(payload).select().single()
     if (!error && data) {
-      setDynamicProjects((prev) => [...prev, data])
+      setProjects((prev) => [...prev, data])
       setForm(EMPTY_FORM)
       setStackInput('')
       setShowForm(false)
